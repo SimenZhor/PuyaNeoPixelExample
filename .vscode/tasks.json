@@ -6,7 +6,7 @@
         {
             "label": "build hex",
             "type": "shell",
-            "command": "c:\\Windows\\System32\\wsl.exe --cd \\\"/mnt/c/Users/Simen/Documents/PCB Resources/FirmwareProjects/PuyaNeoPixelExample\\\" make hex",
+            "command": "c:\\Windows\\System32\\wsl.exe --cd \\\"/mnt/c/Users/Simen/Documents/PCB Resources/FirmwareProjects/PuyaNeoPixelExample\\\" make hex; cp \\\"${workspaceFolder}/*.hex\\\" \\\"C:/Users/Simen/Documents/PCB Resources/FirmwareProjects/FlashHexToPuya/Objects\\\"",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
