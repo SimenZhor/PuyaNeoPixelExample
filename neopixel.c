@@ -6,7 +6,7 @@
 #include <gamma_lut.h>                            // Gamma correction
 
 #define EYE_CNT 2
-#define ENERGY_CNT 4
+#define ENERGY_CNT 6
 #define MAX_HUE 254
 
 #define CLIP(val) ((val) > 254 ? 254 : (val) < 0 ? 0 : (val))
@@ -18,11 +18,11 @@ float factor;
 uint8_t nst = 0;
 // int16_t offset = 0;
 uint8_t eye_idxs[EYE_CNT] = {0, 1};
-uint8_t energy_idxs[ENERGY_CNT]  = {3, 4, 5, 6};
+uint8_t energy_idxs[ENERGY_CNT]  = {2, 3, 4, 5, 6, 7};
 
-uint8_t next_flicker[ENERGY_CNT] = {0, 0, 0, 0};
-uint8_t prev_flicker[ENERGY_CNT] = {0, 0, 0, 0};
-uint8_t flicker[ENERGY_CNT]      = {0, 0, 0, 0};
+uint8_t next_flicker[ENERGY_CNT] = {0, 0, 0, 0, 0, 0};
+uint8_t prev_flicker[ENERGY_CNT] = {0, 0, 0, 0, 0, 0};
+uint8_t flicker[ENERGY_CNT]      = {0, 0, 0, 0, 0, 0};
 // int max_value = 55;
 // int min_value = 0;
 // uint8_t next_flicker = (rand() % (max_value - min_value + 1) + min_value);
@@ -61,7 +61,7 @@ uint32_t rand(void)
 // ===================================================================================
 // Animation Functions
 // ===================================================================================
-uint8_t linear_intererpolation(uint8_t a, uint8_t b, float t)
+uint8_t linear_interpolation(uint8_t a, uint8_t b, float t)
 {
   return (uint8_t)(a + t * (b - a));
 }
@@ -89,11 +89,18 @@ void animateEnergy(uint8_t counter)
     }
 
     // interpolate flickering
-    flicker[idx] = linear_intererpolation(prev_flicker[idx], next_flicker[idx], (float)(counter % freq_divider) / (float)freq_divider);
+    flicker[idx] = linear_interpolation(prev_flicker[idx], next_flicker[idx], (float)(counter % freq_divider) / (float)freq_divider);
 
-    new_r = APPLY_GAMMA((uint8_t)CLIP(energy_color[0] - flicker[idx]));
-    new_g = APPLY_GAMMA((uint8_t)CLIP(energy_color[1] - flicker[idx]));
-    new_b = APPLY_GAMMA((uint8_t)CLIP(energy_color[2] - flicker[idx]));
+    float brightness = 1.0;
+    if (idx == 0 || idx == 5)
+    {
+      // Hard coded reduced brightness on LEDs next to face
+      brightness = 0.4;
+    }
+    new_r = APPLY_GAMMA((uint8_t)CLIP((energy_color[0] - flicker[idx]) * brightness));
+    new_g = APPLY_GAMMA((uint8_t)CLIP((energy_color[1] - flicker[idx]) * brightness));
+    new_b = APPLY_GAMMA((uint8_t)CLIP((energy_color[2] - flicker[idx]) * brightness));
+    
     NEO_writeColor(energy_idxs[idx], new_r, new_g, new_b);
   }
 }
@@ -127,7 +134,7 @@ int main(void) {
     {
       animateEnergy(delay);
       NEO_update();
-      DLY_ms(5);
+      DLY_ms(1);
     }
 
     // Fade out
@@ -144,11 +151,5 @@ int main(void) {
       DLY_ms(5);
     }
 
-    // "Delay" (eyes don't change, energy is changing)
-    for(int delay = 0; delay < (MAX_HUE + 1); delay++){
-      animateEnergy(delay);
-      NEO_update();
-      DLY_ms(5);
-    }
   }
 }
