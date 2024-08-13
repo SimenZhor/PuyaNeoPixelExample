@@ -6,7 +6,7 @@
 #include <gamma_lut.h>                            // Gamma correction
 
 #define EYE_CNT 2
-#define ENERGY_CNT 6
+#define ENERGY_CNT 4
 #define MAX_HUE 254
 
 #define CLIP(val) ((val) > 254 ? 254 : (val) < 0 ? 0 : (val))
@@ -18,11 +18,11 @@ float factor;
 uint8_t nst = 0;
 // int16_t offset = 0;
 uint8_t eye_idxs[EYE_CNT] = {0, 1};
-uint8_t energy_idxs[ENERGY_CNT] = {2, 3, 4, 5, 6, 7};
+uint8_t energy_idxs[ENERGY_CNT]  = {3, 4, 5, 6};
 
-uint8_t next_flicker[ENERGY_CNT] = {0, 0, 0, 0, 0, 0};
-uint8_t prev_flicker[ENERGY_CNT] = {0, 0, 0, 0, 0, 0};
-uint8_t flicker[ENERGY_CNT] = {0, 0, 0, 0, 0, 0};
+uint8_t next_flicker[ENERGY_CNT] = {0, 0, 0, 0};
+uint8_t prev_flicker[ENERGY_CNT] = {0, 0, 0, 0};
+uint8_t flicker[ENERGY_CNT]      = {0, 0, 0, 0};
 // int max_value = 55;
 // int min_value = 0;
 // uint8_t next_flicker = (rand() % (max_value - min_value + 1) + min_value);
