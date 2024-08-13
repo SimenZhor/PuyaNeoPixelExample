@@ -141,7 +141,7 @@ extern "C" {
 #define SYS_TICK_INIT     1         // 1: init and start SYSTICK on startup
 #define SYS_GPIO_EN       1         // 1: enable GPIO ports on startup
 #define SYS_CLEAR_BSS     0         // 1: clear uninitialized variables
-#define SYS_USE_VECTORS   0         // 1: create interrupt vector table
+#define SYS_USE_VECTORS   1         // 1: create interrupt vector table
 #define SYS_USE_HSE       0         // 1: use external crystal for system clock
 
 // ===================================================================================
@@ -288,16 +288,19 @@ void RTC_setAlarm(uint32_t val);      // set RTC alarm value (default 0xffffffff
 // ===================================================================================
 #define STK_enable()      SysTick->CTRL = SysTick_CTRL_ENABLE | SysTick_CTRL_CLKSOURCE
 #define STK_disable()     SysTick->CTRL = 0
+extern uint32_t get_ticks_ms(void);
+extern uint32_t millis(void);
 
 // ===================================================================================
 // Delay (DLY) Functions (using SYSTICK)
 // ===================================================================================
 #define DLY_US_TIME       (F_CPU / 1000000)             // system ticks per us
 #define DLY_MS_TIME       (F_CPU / 1000)                // system ticks per ms
-#define DLY_us(n)         DLY_ticks((n)*DLY_US_TIME-1)  // delay n microseconds
-void DLY_ticks(uint32_t n);                             // delay n+1 clock cycles
+// #define DLY_us(n)         DLY_ticks((n)*DLY_US_TIME-1)  // delay n microseconds
+// void DLY_ticks(uint32_t n);                             // delay n+1 clock cycles
 static inline void DLY_ms(uint32_t ms) {                // delay n milliseconds
-  while(ms--) DLY_us(1000);
+  uint32_t current_millis = millis();
+  while(millis()-current_millis <= ms) // potentially adds up to 1 ms on top of the requested time.
 }
 
 // ===================================================================================

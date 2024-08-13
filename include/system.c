@@ -21,12 +21,13 @@ void SYS_init(void) {
 
   // Init SYSTICK
   #if SYS_TICK_INIT > 0
-  SysTick->CTRL = SysTick_CTRL_ENABLE | SysTick_CTRL_CLKSOURCE;
+  // SysTick->CTRL = SysTick_CTRL_ENABLE | SysTick_CTRL_CLKSOURCE;
+  SysTick_Config(DLY_MS_TIME); // Enable the SysTick IRQ handler to be invoked every n clock cycles (configured for triggering every 1 ms).
   #endif
 
   // Enable GPIO
   #if SYS_GPIO_EN > 0
-  RCC->IOPENR = RCC_IOPENR_GPIOAEN | RCC_IOPENR_GPIOBEN | RCC_IOPENR_GPIOFEN;
+      RCC->IOPENR = RCC_IOPENR_GPIOAEN | RCC_IOPENR_GPIOBEN | RCC_IOPENR_GPIOFEN;
   #endif
 }
 
@@ -143,11 +144,11 @@ void RTC_setAlarm(uint32_t val) {
 // ===================================================================================
 
 // Wait n+1 counts of SysTick
-void DLY_ticks(uint32_t n) {
-  SysTick->LOAD = n;
-  SysTick->VAL  = 0;
-  while(!(SysTick->CTRL & SysTick_CTRL_COUNTFLAG));
-}
+// void DLY_ticks(uint32_t n) {
+//   SysTick->LOAD = n;
+//   SysTick->VAL  = 0;
+//   while(!(SysTick->CTRL & SysTick_CTRL_COUNTFLAG));
+// }
 
 // ===================================================================================
 // Independent Watchdog Timer (IWDG) Functions
@@ -445,4 +446,20 @@ void Reset_Handler(void) {
   // Start main function
   main();
   while(1);
+}
+
+volatile uint32_t ticks_ms = 0;
+
+void SysTick_Handler(void){
+  ticks_ms++;
+}
+
+extern uint32_t get_ticks_ms(void)
+{
+  return ticks_ms;
+}
+
+extern uint32_t millis(void)
+{
+  return ticks_ms;
 }
