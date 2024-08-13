@@ -28,7 +28,15 @@ uint8_t flicker[ENERGY_CNT]      = {0, 0, 0, 0, 0, 0};
 // uint8_t next_flicker = (rand() % (max_value - min_value + 1) + min_value);
 
 uint8_t eye_color[3] = {0, 0, 255};
-uint8_t energy_color[3] = {226, 121, 35}; // Orange fire effect
+// uint8_t energy_color[3] = {226, 121, 35}; // Orange fire effect
+// uint8_t energy_color[3] = {158, 8, 148};  // Purple fire effect
+// uint8_t energy_color[3] = {230, 7, 159}; // Pink fire effect
+// uint8_t energy_color[3] = {15, 219, 242}; // Cyan fire effect
+// uint8_t energy_color[3] = {238, 242, 15}; // Yellow fire effect
+// uint8_t energy_color[3] = {242, 15, 15};  // Red fire effect
+// uint8_t energy_color[3] = {4, 139, 201};  // Teal fire effect (turns quite green)
+// uint8_t energy_color[3] = {153, 0, 255};  // Bright purple fire effect (looks pink)
+uint8_t energy_color[3] = {153, 130, 255};  // White-ish purple fire effect (looks pink-ish white)
 
 // ===================================================================================
 // Pseudo random number generator (Linear Congruential Generator)
