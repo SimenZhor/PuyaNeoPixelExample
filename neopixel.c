@@ -6,8 +6,8 @@
 #include <gamma_lut.h>                            // Gamma correction
 
 #define EYE_CNT 2
-#define ENERGY_CNT 6
-#define MAX_HUE 191
+#define ENERGY_CNT 4
+#define MAX_HUE 254
 
 #define CLIP(val) ((val) > 254 ? 254 : (val) < 0 ? 0 : (val))
 #define APPLY_GAMMA(val) (gamma_lut[(val)])
@@ -23,11 +23,11 @@ int main(void) {
   uint8_t nst = 0;
   // int16_t offset = 0;
   uint8_t eye_idxs[EYE_CNT] = {0, 1};
-  uint8_t energy_idxs[ENERGY_CNT] = {2, 3, 4, 5, 6, 7};
+  uint8_t energy_idxs[ENERGY_CNT] = {3, 4, 5, 6};
 
-  uint8_t eye_color[3] = {0, 0, 255}; 
-  uint8_t energy_color[3] = {252, 144, 3}; 
+  uint8_t eye_color[3] = {0, 0, 255};
   NEO_init();
+  NEO_clearAll();
   
   // Loop
   while(1) {
@@ -56,7 +56,7 @@ int main(void) {
       }
       NEO_update();
       if (!nst--) nst = MAX_HUE;
-      DLY_ms(5);
+      DLY_ms(3);
     }
 
     // "Delay" (eyes don't change, energy is changing)
@@ -72,7 +72,7 @@ int main(void) {
     NEO_update();
     if (!nst--)
       nst = MAX_HUE;
-    DLY_ms(5);
+    DLY_ms(3);
 
     // Fade out
     for (uint8_t brightness = 0; brightness < 255; brightness++)
@@ -100,7 +100,7 @@ int main(void) {
 
       NEO_update();
       if (!nst--) nst = MAX_HUE;
-      DLY_ms(5);
+      DLY_ms(3);
     }
 
     // "Delay" (eyes don't change, energy is changing)
@@ -116,7 +116,7 @@ int main(void) {
       NEO_update();
       if (!nst--)
         nst = MAX_HUE;
-      DLY_ms(5);
+      DLY_ms(3);
     }
   }
 }
