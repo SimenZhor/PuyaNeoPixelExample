@@ -20,10 +20,12 @@ uint8_t nst = 0;
 uint8_t eye_idxs[EYE_CNT] = {0, 1};
 uint8_t energy_idxs[ENERGY_CNT] = {2, 3, 4, 5, 6, 7};
 
-uint8_t flicker = 0;
+uint8_t next_flicker[ENERGY_CNT] = {0, 0, 0, 0, 0, 0};
+uint8_t prev_flicker[ENERGY_CNT] = {0, 0, 0, 0, 0, 0};
+uint8_t flicker[ENERGY_CNT] = {0, 0, 0, 0, 0, 0};
 // int max_value = 55;
 // int min_value = 0;
-// uint8_t flicker = (rand() % (max_value - min_value + 1) + min_value);
+// uint8_t next_flicker = (rand() % (max_value - min_value + 1) + min_value);
 
 uint8_t eye_color[3] = {0, 0, 255};
 uint8_t energy_color[3] = {226, 121, 35}; // Orange fire effect
@@ -59,7 +61,10 @@ uint32_t rand(void)
 // ===================================================================================
 // Animation Functions
 // ===================================================================================
-
+uint8_t linear_intererpolation(uint8_t a, uint8_t b, float t)
+{
+  return (uint8_t)(a + t * (b - a));
+}
 void animateEyes(float brightnessFactor)
 {
 
@@ -71,14 +76,24 @@ void animateEyes(float brightnessFactor)
     NEO_writeColor(eye_idxs[idx], new_r, new_g, new_b);
   }
 }
-void animateEnergy()
+void animateEnergy(uint8_t counter)
 {
+  uint8_t freq_divider = 80;
   for (idx = 0; idx < ENERGY_CNT; idx++)
   {
-    uint8_t flicker = rand8();
-    new_r = APPLY_GAMMA((uint8_t)CLIP(energy_color[0] - flicker));
-    new_g = APPLY_GAMMA((uint8_t)CLIP(energy_color[1] - flicker));
-    new_b = APPLY_GAMMA((uint8_t)CLIP(energy_color[2] - flicker));
+    if (counter % freq_divider == 0)
+    {
+      // Slow down fire animation relative to the eye animation
+      prev_flicker[idx] = next_flicker[idx]; 
+      next_flicker[idx] = rand8() % 150;
+    }
+
+    // interpolate flickering
+    flicker[idx] = linear_intererpolation(prev_flicker[idx], next_flicker[idx], (float)(counter % freq_divider) / (float)freq_divider);
+
+    new_r = APPLY_GAMMA((uint8_t)CLIP(energy_color[0] - flicker[idx]));
+    new_g = APPLY_GAMMA((uint8_t)CLIP(energy_color[1] - flicker[idx]));
+    new_b = APPLY_GAMMA((uint8_t)CLIP(energy_color[2] - flicker[idx]));
     NEO_writeColor(energy_idxs[idx], new_r, new_g, new_b);
   }
 }
@@ -102,7 +117,7 @@ int main(void) {
       animateEyes(factor);
 
       // Energy
-      animateEnergy();
+      animateEnergy(brightness);
       NEO_update();
       DLY_ms(5);
     }
@@ -110,7 +125,7 @@ int main(void) {
     // "Delay" (eyes don't change, energy is changing)
     for (int delay = 0; delay < (MAX_HUE + 1); delay++)
     {
-      animateEnergy();
+      animateEnergy(delay);
       NEO_update();
       DLY_ms(5);
     }
@@ -123,7 +138,7 @@ int main(void) {
       animateEyes(factor);
 
       // Energy
-      animateEnergy();
+      animateEnergy(brightness);
 
       NEO_update();
       DLY_ms(5);
@@ -131,7 +146,7 @@ int main(void) {
 
     // "Delay" (eyes don't change, energy is changing)
     for(int delay = 0; delay < (MAX_HUE + 1); delay++){
-      animateEnergy();
+      animateEnergy(delay);
       NEO_update();
       DLY_ms(5);
     }
