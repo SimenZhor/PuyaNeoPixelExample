@@ -7,10 +7,30 @@
             "label": "build hex",
             "type": "shell",
             "command": "c:\\Windows\\System32\\wsl.exe --cd \\\"/mnt/c/Users/Simen/Documents/PCB Resources/FirmwareProjects/PuyaNeoPixelExample\\\" make hex; cp \\\"${workspaceFolder}/*.hex\\\" \\\"C:/Users/Simen/Documents/PCB Resources/FirmwareProjects/FlashHexToPuya/Objects\\\"",
-            "problemMatcher": [],
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "build all",
+            "type": "shell",
+            "command": "c:\\Windows\\System32\\wsl.exe --cd \\\"/mnt/c/Users/Simen/Documents/PCB Resources/FirmwareProjects/PuyaNeoPixelExample\\\" make all",
+            "problemMatcher": "$gcc",
             "group": {
                 "kind": "build",
                 "isDefault": true
+            }
+        },
+        {
+            "label": "build elf",
+            "type": "shell",
+            "command": "c:\\Windows\\System32\\wsl.exe --cd \\\"/mnt/c/Users/Simen/Documents/PCB Resources/FirmwareProjects/PuyaNeoPixelExample\\\" make elf",
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build",
+                "isDefault": false
             }
         }
     ]
