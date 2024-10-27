@@ -118,6 +118,8 @@ void animateEnergy(uint8_t counter)
 // ===================================================================================
 
 int main(void) {
+  // Delay to prevent getting stuck in non programmable mode
+  DLY_ms(500);
   // Setup
   NEO_init();
   NEO_clearAll();

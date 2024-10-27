@@ -17,6 +17,19 @@
             "svdFile": "CMSIS/Device/PY32F0xx/py32f002axx.svd",
             "preLaunchTask": "build elf",
             "showDevDebugOutput": "none"
-        }
+        },
+        {
+            "name": "J-Link Flash",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/neopixel.elf",
+            "servertype": "jlink",
+            "serverpath": "C:/Program Files/SEGGER/JLink_V798h/JLinkGDBServerCL.exe",
+            "interface": "swd",
+            "device": "PY32F002Ax5",
+            "svdFile": "CMSIS/Device/PY32F0xx/py32f002axx.svd",
+            "showDevDebugOutput": "none"
+        },
     ]
 }
