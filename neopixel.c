@@ -73,6 +73,7 @@ uint8_t linear_interpolation(uint8_t a, uint8_t b, float t)
 {
   return (uint8_t)(a + t * (b - a));
 }
+
 void animateEyes(float brightnessFactor)
 {
 
@@ -84,6 +85,7 @@ void animateEyes(float brightnessFactor)
     NEO_writeColor(eye_idxs[idx], new_r, new_g, new_b);
   }
 }
+
 void animateEnergy(uint8_t counter)
 {
   uint8_t freq_divider = 80;
@@ -113,6 +115,109 @@ void animateEnergy(uint8_t counter)
   }
 }
 
+void animateRainbow()
+{
+  // Setup
+  uint8_t idx, new_r, new_g, new_b, hue_val;
+  float factor;
+  uint8_t nst = 0;
+  // int16_t offset = 0;
+  static const uint8_t energy_count = 4;
+  uint8_t energy_idxs[4] = {3, 4, 5, 6};
+
+  uint8_t eye_color[3] = {0, 0, 255};
+  // Fade in
+  for (uint8_t brightness = 0; brightness < 255; brightness++)
+  {
+    // Eyes
+    factor = (float)brightness / 255;
+
+    new_r = APPLY_GAMMA((uint8_t)CLIP(eye_color[0] * factor));
+    new_g = APPLY_GAMMA((uint8_t)CLIP(eye_color[1] * factor));
+    new_b = APPLY_GAMMA((uint8_t)CLIP(eye_color[2] * factor));
+    for (idx = 0; idx < EYE_CNT; idx++)
+    {
+      NEO_writeColor(eye_idxs[idx], new_r, new_g, new_b);
+    }
+
+    // Energy
+    hue_val = nst;
+    for (idx = 0; idx < energy_count; idx++)
+    {
+      NEO_writeHue(energy_idxs[idx], hue_val, 0);
+      hue_val += (MAX_HUE + 1) / energy_count;
+      if (hue_val >= (MAX_HUE + 1))
+        hue_val -= (MAX_HUE + 1);
+    }
+    NEO_update();
+    if (!nst--)
+      nst = MAX_HUE;
+    DLY_ms(3);
+  }
+
+  // "Delay" (eyes don't change, energy is changing)
+  hue_val = nst;
+  for (idx = 0; idx < energy_count; idx++)
+  {
+    NEO_writeHue(energy_idxs[idx], hue_val, 0);
+    hue_val += (MAX_HUE + 1) / energy_count;
+    if (hue_val >= (MAX_HUE + 1))
+      hue_val -= (MAX_HUE + 1);
+  }
+
+  NEO_update();
+  if (!nst--)
+    nst = MAX_HUE;
+  DLY_ms(3);
+
+  // Fade out
+  for (uint8_t brightness = 0; brightness < 255; brightness++)
+  {
+    // Eyes
+    factor = 1.0 - (float)brightness / 255;
+
+    new_r = APPLY_GAMMA((uint8_t)CLIP(eye_color[0] * factor));
+    new_g = APPLY_GAMMA((uint8_t)CLIP(eye_color[1] * factor));
+    new_b = APPLY_GAMMA((uint8_t)CLIP(eye_color[2] * factor));
+    for (idx = 0; idx < EYE_CNT; idx++)
+    {
+      NEO_writeColor(eye_idxs[idx], new_r, new_g, new_b);
+    }
+
+    // Energy
+    hue_val = nst;
+    for (idx = 0; idx < energy_count; idx++)
+    {
+      NEO_writeHue(energy_idxs[idx], hue_val, 0);
+      hue_val += (MAX_HUE + 1) / energy_count;
+      if (hue_val >= (MAX_HUE + 1))
+        hue_val -= (MAX_HUE + 1);
+    }
+
+    NEO_update();
+    if (!nst--)
+      nst = MAX_HUE;
+    DLY_ms(3);
+  }
+
+  // "Delay" (eyes don't change, energy is changing)
+  for (int delay = 0; delay < (MAX_HUE + 1); delay++)
+  {
+    hue_val = nst;
+    for (idx = 0; idx < energy_count; idx++)
+    {
+      NEO_writeHue(energy_idxs[idx], hue_val, 0);
+      hue_val += (MAX_HUE + 1) / energy_count;
+      if (hue_val >= (MAX_HUE + 1))
+        hue_val -= (MAX_HUE + 1);
+    }
+    NEO_update();
+    if (!nst--)
+      nst = MAX_HUE;
+    DLY_ms(3);
+  }
+}
+
 // ===================================================================================
 // Main Function
 // ===================================================================================
@@ -124,41 +229,48 @@ int main(void) {
   NEO_init();
   NEO_clearAll();
   
+  uint8_t rainbowAnim = 0;
+
   // Loop
   while(1) {
-    // Fade in
-    for (uint8_t brightness = 0; brightness < 255; brightness++)
-    {
-      // Eyes
-      factor = (float) brightness / 255;
-      animateEyes(factor);
+    if (rainbowAnim){
+      animateRainbow();
+    }else{
+      // Fade in
+      for (uint8_t brightness = 0; brightness < 255; brightness++)
+      {
+        // Eyes
+        factor = (float) brightness / 255;
+        animateEyes(factor);
 
-      // Energy
-      animateEnergy(brightness);
-      NEO_update();
-      DLY_ms(5);
-    }
+        // Energy
+        animateEnergy(brightness);
+        NEO_update();
+        DLY_ms(5);
+      }
 
-    // "Delay" (eyes don't change, energy is changing)
-    for (int delay = 0; delay < (MAX_HUE + 1); delay++)
-    {
-      animateEnergy(delay);
-      NEO_update();
-      DLY_ms(1);
-    }
+      // "Delay" (eyes don't change, energy is changing)
+      for (int delay = 0; delay < (MAX_HUE + 1); delay++)
+      {
+        animateEnergy(delay);
+        NEO_update();
+        DLY_ms(1);
+      }
 
-    // Fade out
-    for (uint8_t brightness = 0; brightness < 255; brightness++)
-    {
-      // Eyes
-      factor = 1.0 - (float) brightness / 255;
-      animateEyes(factor);
+      // Fade out
+      for (uint8_t brightness = 0; brightness < 255; brightness++)
+      {
+        // Eyes
+        factor = 1.0 - (float) brightness / 255;
+        animateEyes(factor);
 
-      // Energy
-      animateEnergy(brightness);
+        // Energy
+        animateEnergy(brightness);
 
-      NEO_update();
-      DLY_ms(5);
+        NEO_update();
+        DLY_ms(5);
+      }
+
     }
 
   }
